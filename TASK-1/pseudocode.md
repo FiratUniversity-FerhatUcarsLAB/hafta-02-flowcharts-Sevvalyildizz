@@ -1,3 +1,6 @@
+Ad Soyad : Şevval Yıldız
+Öğrenci no: 250541025
+
 # Değişkenlerin başlatılması
 YAZ "Kartı takınız..."
 OKU kart_ok  # (sadece akış için; gerçek sürümde kart verisi okunur)
