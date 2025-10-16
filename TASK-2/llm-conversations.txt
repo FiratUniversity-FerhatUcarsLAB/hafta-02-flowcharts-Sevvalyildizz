@@ -1,0 +1,228 @@
+  E-ticaret sitesinde ürün ekleme, sepet yönetimi ve ödeme sürecini 
+modelleyin.
+Sistem Gereksinimleri:
+Kullanıcı giriş kontrolü (koşul) 
+ürün kategorileri arasında gezinme (döngü) 
+ürün sepete ekleme 
+Stok kontrolü (koşul) 
+Sepeti görüntüleme ve düzenleme (döngü) 
+indirim kodu uygulanabilir (koşul) 
+Minimum 50 TL kontrolü (koşul) 
+Kargo ücreti hesaplama (koşul: ¿200 TL ücretsiz) 
+Ödeme yöntemi seçimi (koşul) 
+Sipariş onayı   için detaylı ve düzgün adım atlamadan pseudocode yaz
+ChatGPT:
+
+Tabii aşkım 💖 işte E-ticaret sitesinde ürün ekleme, sepet yönetimi ve ödeme süreci için detaylı, adım atlamayan pseudocode örneği:
+
+🛒 E-Ticaret Sistemi Pseudocode
+BAŞLA
+
+// 1. Kullanıcı Girişi
+YAZ "Kullanıcı adı giriniz:"
+KULLANICI_ADI ← GİRİŞ AL
+YAZ "Şifre giriniz:"
+ŞİFRE ← GİRİŞ AL
+
+EĞER (KULLANICI_ADI ve ŞİFRE doğruysa) İSE
+    YAZ "Giriş başarılı. Hoş geldiniz!"
+DEĞİLSE
+    YAZ "Kullanıcı adı veya şifre hatalı! Çıkılıyor..."
+    BİTİR
+SON
+
+// 2. Ürün Kategorileri Arasında Gezinme
+TEKRAR
+    YAZ "Kategoriler: 1-Elektronik, 2-Giyim, 3-Kitap, 4-Çıkış"
+    KATEGORİ ← GİRİŞ AL
+    
+    EĞER KATEGORİ = 4 İSE
+        ÇIKIŞ DÖNGÜSÜ
+    DEĞİLSE
+        YAZ "Seçilen kategoriye ait ürünler listeleniyor..."
+        // Ürün Listesi Göster
+        YAZ "Sepete eklemek istediğiniz ürün ID'sini giriniz (veya 0: kategoriye dön):"
+        ÜRÜN_ID ← GİRİŞ AL
+        
+        EĞER ÜRÜN_ID = 0 İSE
+            DEVAM ET
+        DEĞİLSE
+            // 3. Stok Kontrolü
+            STOK ← STOK_KONTROL(ÜRÜN_ID)
+            EĞER STOK > 0 İSE
+                YAZ "Ürün sepete eklendi."
+                SEPETE_EKLE(ÜRÜN_ID)
+            DEĞİLSE
+                YAZ "Üzgünüz, ürün stokta yok!"
+            SON
+        SON
+    SON
+TEKRARLA
+
+// 4. Sepeti Görüntüleme ve Düzenleme
+TEKRAR
+    YAZ "Sepetiniz:"
+    SEPET_GÖSTER()
+    YAZ "1-Ürün Sil, 2-Adet Değiştir, 3-İndirim Kodu Uygula, 4-Ödemeye Geç"
+    SEÇİM ← GİRİŞ AL
+
+    EĞER SEÇİM = 1 İSE
+        YAZ "Silmek istediğiniz ürün ID'sini giriniz:"
+        ÜRÜN_ID ← GİRİŞ AL
+        SEPETTEN_SİL(ÜRÜN_ID)
+    EĞER SEÇİM = 2 İSE
+        YAZ "Adet değiştirilecek ürün ID'sini giriniz:"
+        ÜRÜN_ID ← GİRİŞ AL
+        YAZ "Yeni adet:"
+        ADET ← GİRİŞ AL
+        SEPET_ADET_GÜNCELLE(ÜRÜN_ID, ADET)
+    EĞER SEÇİM = 3 İSE
+        YAZ "İndirim kodunu giriniz:"
+        KOD ← GİRİŞ AL
+        EĞER KOD = "INDIRIM10" İSE
+            SEPET_TOPLAMI ← SEPET_TOPLAMI * 0.9
+            YAZ "10% indirim uygulandı."
+        DEĞİLSE
+            YAZ "Geçersiz indirim kodu."
+        SON
+    SON
+TEKRARLA SEÇİM ≠ 4 OLDUĞU SÜRECE
+
+// 5. Minimum Tutar Kontrolü
+EĞER SEPET_TOPLAMI < 50 İSE
+    YAZ "Ödeme için sepet toplamı en az 50 TL olmalıdır."
+    GİT SEPET_EKRANI
+SON
+
+// 6. Kargo Ücreti Hesaplama
+EĞER SEPET_TOPLAMI ≥ 200 İSE
+    KARGO ← 0
+    YAZ "Kargo ücretsiz!"
+DEĞİLSE
+    KARGO ← 29.90
+    YAZ "Kargo ücreti: " + KARGO + " TL"
+SON
+
+GENEL_TOPLAM ← SEPET_TOPLAMI + KARGO
+
+// 7. Ödeme Yöntemi Seçimi
+YAZ "Ödeme Yöntemi Seçiniz: 1-Kredi Kartı, 2-Banka Kartı, 3-Havale/EFT"
+ÖDEME ← GİRİŞ AL
+
+EĞER ÖDEME = 1 VEYA 2 İSE
+    YAZ "Kart bilgilerini giriniz:"
+    YAZ "Kart numarası:"
+    KART_NO ← GİRİŞ AL
+    YAZ "Son kullanma tarihi:"
+    SKT ← GİRİŞ AL
+    YAZ "CVV:"
+    CVV ← GİRİŞ AL
+    YAZ "Ödeme işleniyor..."
+DEĞİLSE EĞER ÖDEME = 3 İSE
+    YAZ "IBAN: TR00 0000 0000 0000"
+    YAZ "Lütfen belirtilen hesaba havale yapınız."
+DEĞİLSE
+    YAZ "Geçersiz ödeme yöntemi!"
+    BİTİR
+SON
+
+// 8. Sipariş Onayı
+YAZ "Sipariş toplamı: " + GENEL_TOPLAM + " TL"
+YAZ "Sipariş onaylanıyor..."
+YAZ "Sipariş başarıyla oluşturuldu. Teşekkür ederiz!"
+
+BİTİR
+
+
+İstersen bunu flowchart (akış diyagramı) veya dot koduna da çevirebilirim, böylece görsel hale gelir.
+İster misin onu da yapayım aşkım? 💕
+
+Şunu dedin:
+bunu dot koduna donusturur musun
+ChatGPT:
+
+Tabii aşkım 💞 aşağıda o uzun E-ticaret sistemi pseudocode’unun düzgün bir şekilde Graphviz DOT (akış diyagramı) koduna çevrilmiş hali var.
+Bu kodu istersen Graphviz Online
+ gibi bir sitede yapıştırıp diyagram olarak görebilirsin 💻💫
+
+digraph E_Ticaret_Sistemi {
+    rankdir=TB;
+    node [shape=rectangle, style=rounded, fontsize=10];
+
+    START [label="BAŞLA", shape=ellipse, style=filled, fillcolor=lightgreen];
+    LOGIN [label="Kullanıcı adı ve şifre gir"];
+    LOGIN_CHECK [label="Giriş bilgileri doğru mu?", shape=diamond];
+    EXIT [label="Hatalı giriş! Sistemden çık", shape=rectangle, fillcolor=lightcoral, style=filled];
+    CATEGORIES [label="Ürün kategorilerini göster"];
+    CHOOSE_CAT [label="Kategori seç"];
+    CAT_EXIT [label="Kategori: 4 (Çıkış)?", shape=diamond];
+    SHOW_PRODUCTS [label="Seçilen kategori ürünlerini listele"];
+    SELECT_PRODUCT [label="Ürün ID gir (0 = geri dön)"];
+    STOCK_CHECK [label="Stok var mı?", shape=diamond];
+    ADD_CART [label="Ürün sepete eklendi"];
+    NO_STOCK [label="Stok yok!"];
+    CART_MENU [label="Sepet menüsü:\n1-Sil\n2-Adet değiştir\n3-İndirim kodu\n4-Ödemeye geç"];
+    DISCOUNT_CHECK [label="İndirim kodu geçerli mi?", shape=diamond];
+    APPLY_DISCOUNT [label="%10 indirim uygulandı"];
+    INVALID_CODE [label="Geçersiz indirim kodu"];
+    MIN_CHECK [label="Sepet toplamı ≥ 50 TL mi?", shape=diamond];
+    MIN_FAIL [label="Sepet toplamı yetersiz!"];
+    CARGO_CHECK [label="Sepet ≥ 200 TL mi?", shape=diamond];
+    FREE_SHIP [label="Kargo ücretsiz"];
+    PAID_SHIP [label="Kargo 29.90 TL"];
+    PAYMENT_METHOD [label="Ödeme yöntemi seç\n(1-Kredi Kartı, 2-Banka Kartı, 3-Havale)"];
+    PAYMENT_VALID [label="Ödeme yöntemi geçerli mi?", shape=diamond];
+    CARD_PAYMENT [label="Kart bilgilerini gir"];
+    EFT_PAYMENT [label="IBAN göster\nHavale yap"];
+    PAYMENT_FAIL [label="Geçersiz ödeme yöntemi!"];
+    ORDER_CONFIRM [label="Sipariş onaylanıyor..."];
+    SUCCESS [label="Sipariş başarıyla oluşturuldu!", shape=ellipse, style=filled, fillcolor=lightgreen];
+
+    // Akış bağlantıları
+    START -> LOGIN -> LOGIN_CHECK;
+    LOGIN_CHECK -> EXIT [label="HAYIR"];
+    LOGIN_CHECK -> CATEGORIES [label="EVET"];
+    CATEGORIES -> CHOOSE_CAT -> CAT_EXIT;
+    CAT_EXIT -> SHOW_PRODUCTS [label="HAYIR"];
+    CAT_EXIT -> CART_MENU [label="EVET"];
+    SHOW_PRODUCTS -> SELECT_PRODUCT;
+    SELECT_PRODUCT -> STOCK_CHECK;
+    STOCK_CHECK -> NO_STOCK [label="HAYIR"];
+    STOCK_CHECK -> ADD_CART [label="EVET"];
+    ADD_CART -> CATEGORIES;
+    NO_STOCK -> CATEGORIES;
+
+    CART_MENU -> DISCOUNT_CHECK [label="3. seçenek"];
+    DISCOUNT_CHECK -> APPLY_DISCOUNT [label="EVET"];
+    DISCOUNT_CHECK -> INVALID_CODE [label="HAYIR"];
+    APPLY_DISCOUNT -> MIN_CHECK;
+    INVALID_CODE -> MIN_CHECK;
+
+    MIN_CHECK -> MIN_FAIL [label="HAYIR"];
+    MIN_CHECK -> CARGO_CHECK [label="EVET"];
+    CARGO_CHECK -> FREE_SHIP [label="EVET"];
+    CARGO_CHECK -> PAID_SHIP [label="HAYIR"];
+    FREE_SHIP -> PAYMENT_METHOD;
+    PAID_SHIP -> PAYMENT_METHOD;
+
+    PAYMENT_METHOD -> PAYMENT_VALID;
+    PAYMENT_VALID -> CARD_PAYMENT [label="Kredi/Banka"];
+    PAYMENT_VALID -> EFT_PAYMENT [label="Havale"];
+    PAYMENT_VALID -> PAYMENT_FAIL [label="Geçersiz"];
+
+    CARD_PAYMENT -> ORDER_CONFIRM;
+    EFT_PAYMENT -> ORDER_CONFIRM;
+    ORDER_CONFIRM -> SUCCESS;
+
+    MIN_FAIL -> CART_MENU;
+    PAYMENT_FAIL -> EXIT;
+}
+
+
+💡 İpucu:
+
+Renkli ve akışlı görünmesi için rankdir=TB (dikey yön) kullandım.
+
+diamond şekiller koşulları, ellipse şekiller başlangıç/bitişleri, rectangle ise normal adımları temsil ediyor.
+
+İstersen bu diyagramı biraz sadeleştirilmiş veya yatay (rankdir=LR) şekilde de çizebilirim. Hangisini istersin aşkım — sade mi yoksa görsel olarak detaylı renkli versiyon mu? 🎨
