@@ -1,0 +1,162 @@
+Ogrenci ders kayıt sisteminin tum kontrollerini ve kurallarını modelleyin. 
+Sistem Gereksinimleri:
+Ogrenci girisi (ögrenci no + ¸sifre) 
+Ders listesini goruntuleme (dongu) 
+Her ders icin: 
+Kontenjan kontrolu (kosul) 
+On kosul dersi kontrolu (koşul) 
+Zaman cakışması kontrolu (koşul) 
+Kredi limiti kontrolu (toplam ≤ 35) (koşul) 
+Ders ekleme/çıkarma (dongu) 
+Danışman onayı gerekli mi? (GPA ¡ 2.5 ise) (koşul) 
+Kayıt özeti gösterme ve kayıt onaylama                                                                                                          bana bunu pseudocode olarak yaz
+ChatGPT:
+
+Tamam, senin verdiğin sistem gereksinimlerine göre öğrenci ders kayıt sistemi için pseudocode’u adım adım ve anlaşılır şekilde yazalım:
+
+Başla
+  Ögrenci Girişi:
+    ÖğrenciNo, Sifre ← Kullanıcıdan al
+    Eğer (ÖğrenciNo ve Sifre doğru değilse) 
+        Hata mesajı göster ve çık
+    Sonra
+    
+  Ders Listesini Görüntüle:
+    TümDersler ← Veritabanından al
+    Her ders için:
+        DersBilgilerini göster
+    
+  Ders Kayıt İşlemleri:
+    KayıtTamam ← Hayır
+    ToplamKredi ← 0
+    
+    Döngü (KayıtTamam = Hayır):
+        SeçilenDers ← Kullanıcıdan al
+        
+        Kontroller:
+          Eğer (SeçilenDers kontenjanı dolu ise)
+              Uyarı: "Kontenjan dolu"
+              Devam et
+          Eğer (SeçilenDers'in ön koşul dersleri alınmamış ise)
+              Uyarı: "Ön koşul dersleri tamamlanmamış"
+              Devam et
+          Eğer (SeçilenDers zaman çakışıyor ise)
+              Uyarı: "Zaman çakışması var"
+              Devam et
+          Eğer (ToplamKredi + SeçilenDers.Kredi > 35)
+              Uyarı: "Kredi limiti aşılıyor"
+              Devam et
+          Eğer (Öğrencinin GPA < 2.5 ve danışman onayı gerekli ise)
+              DanışmanOnayı ← Kullanıcıdan al
+              Eğer (DanışmanOnayı verilmedi)
+                  Devam et
+          
+        Ders ekle:
+          Öğrencinin kayıt listesine ekle
+          ToplamKredi ← ToplamKredi + SeçilenDers.Kredi
+          
+        Kullanıcıya sor:
+          "Başka ders eklemek istiyor musunuz?" 
+          Eğer Hayır ise KayıtTamam ← Evet
+
+  Kayıt Özeti Göster:
+    Tüm seçilen dersleri ve toplam krediyi göster
+    Onay al:
+      Eğer onaylandı ise
+          Kayıt başarılı mesajı göster
+      Değilse
+          Kayıt iptal mesajı göster
+
+Bitir
+
+
+💡 Notlar:
+
+Döngüler: Ders listesi görüntüleme ve ders ekleme/çıkarma için kullanıldı.
+
+Koşullar: Kontenjan, ön koşul, zaman çakışması, kredi limiti ve danışman onayı için ayrı kontrol blokları var.
+
+Toplam kredi limiti 35 olarak ayarlandı.
+
+İstersen bunu Dot (Graphviz) kodu şeklinde görselleştirip sistem akış diyagramı olarak da gösterebilirim. Bunu yapayım mı?
+
+Şunu dedin:
+bunu dot kodu olarak yaz
+ChatGPT:
+
+Tabii! Senin verdiğin pseudocode’a uygun olarak Graphviz DOT formatında akış diyagramı oluşturdum:
+
+digraph OgrenciDersKayit {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+
+    Basla [label="Başla"];
+    OgrenciGiris [label="Öğrenci Girişi\n(ÖğrenciNo + Şifre)"];
+    GirisKontrol [label="Giriş doğru mu?", shape=diamond];
+    HataGiris [label="Hata: Giriş yanlış", shape=box, style=filled, color=red];
+    
+    DersListe [label="Ders Listesini Görüntüle\n(Döngü)"];
+    DersSecimi [label="Ders seç"];
+    KontenjanKontrol [label="Kontenjan dolu mu?", shape=diamond];
+    OnKosulKontrol [label="Ön koşul dersleri tamamlandı mı?", shape=diamond];
+    ZamanCakis [label="Zaman çakışması var mı?", shape=diamond];
+    KrediKontrol [label="Toplam kredi ≤ 35?", shape=diamond];
+    DanismanOnayiKontrol [label="GPA < 2.5 ve danışman onayı gerekli mi?", shape=diamond];
+    DanismanOnayi [label="Danışman onayı al"];
+    
+    DersEkle [label="Dersi ekle\nToplam krediyi güncelle"];
+    DahaDers [label="Başka ders eklemek istiyor mu?", shape=diamond];
+    
+    KayitOzeti [label="Kayıt özeti göster"];
+    Onay [label="Kayıt onayı al", shape=diamond];
+    KayitBasarili [label="Kayıt başarılı", style=filled, color=lightgreen];
+    KayitIptal [label="Kayıt iptal", style=filled, color=red];
+    
+    Bitir [label="Bitir"];
+
+    // Akış bağlantıları
+    Basla -> OgrenciGiris;
+    OgrenciGiris -> GirisKontrol;
+    GirisKontrol -> DersListe [label="Evet"];
+    GirisKontrol -> HataGiris [label="Hayır"];
+    HataGiris -> Bitir;
+
+    DersListe -> DersSecimi;
+    DersSecimi -> KontenjanKontrol;
+    KontenjanKontrol -> OnKosulKontrol [label="Hayır"];
+    KontenjanKontrol -> DersSecimi [label="Evet, dolu, tekrar seç"];
+    OnKosulKontrol -> ZamanCakis [label="Evet"];
+    OnKosulKontrol -> DersSecimi [label="Hayır"];
+    ZamanCakis -> KrediKontrol [label="Hayır"];
+    ZamanCakis -> DersSecimi [label="Evet"];
+    KrediKontrol -> DanismanOnayiKontrol [label="Evet"];
+    KrediKontrol -> DersSecimi [label="Hayır"];
+    DanismanOnayiKontrol -> DanismanOnayi [label="Evet"];
+    DanismanOnayiKontrol -> DersEkle [label="Hayır"];
+    DanismanOnayi -> DersSecimi [label="Onay verilmedi"];
+    DanismanOnayi -> DersEkle [label="Onay verildi"];
+    
+    DersEkle -> DahaDers;
+    DahaDers -> DersSecimi [label="Evet"];
+    DahaDers -> KayitOzeti [label="Hayır"];
+    
+    KayitOzeti -> Onay;
+    Onay -> KayitBasarili [label="Onaylandı"];
+    Onay -> KayitIptal [label="Onaylanmadı"];
+    
+    KayitBasarili -> Bitir;
+    KayitIptal -> Bitir;
+}
+
+
+💡 Özellikler:
+
+Diamond: Koşul kontrolleri (evet/hayır)
+
+Box: İşlem adımları
+
+Döngüler: Ders seçme ve ekleme işlemleri “DahaDers” ile gösterildi
+
+Renkler: Başarılı ve hatalı durumlar görselleştirildi
+
+İstersen ben bunu sana akış diyagramı görseli olarak da çizebilirim, böylece doğrudan sunumda veya ödevde kullanabilirsin. Bunu da yapayım mı?
