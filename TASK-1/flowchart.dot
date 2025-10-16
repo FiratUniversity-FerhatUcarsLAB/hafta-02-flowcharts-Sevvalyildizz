@@ -1,15 +1,16 @@
 Ad Soyad : Şevval Yıldız
 Öğrenci No: 250541025
 
- digraph ATM {
+digraph ATM {
   rankdir=TB;
+  graph [fontname="Helvetica"];
   node [fontname="Helvetica"];
   edge [fontname="Helvetica"];
 
-  // Node şekilleri
+  // Düğümler (her düğüm için shape açıkça verildi)
   start [label="BAŞLA", shape=oval];
   read_card [label="YAZ: Kartı takınız...\nOKU kart", shape=parallelogram];
-  init_vars [label="Hesap verileri başlat\n(PIN, bakiye, günlük limit,\n günlük_çekilen=0, max_hak=3)", shape=rectangle];
+  init_vars [label="Hesap verileri başlat\n(PIN, bakiye, günlük limit,\ngunluk_cekilen=0, max_hak=3)", shape=rectangle];
 
   pin_prompt [label="YAZ: PIN giriniz\nOKU girilen_PIN", shape=parallelogram];
   check_pin [label="EGER girilen_PIN = kayıtlı_PIN ?", shape=diamond];
@@ -17,7 +18,7 @@ Ad Soyad : Şevval Yıldız
   pin_failed [label="kalan_hak--\nEGER kalan_hak>0 ?", shape=diamond];
   card_block [label="YAZ: Kartınız bloke edildi.\nSON", shape=oval];
 
-  main_menu [label="YAZ: İşlem seçiniz\n1) Para Çekme 2) Çıkış\nOKU secim", shape=parallelogram];
+  main_menu [label="YAZ: İşlem seçiniz\n1) Para Çekme  2) Çıkış\nOKU secim", shape=parallelogram];
   exit_node [label="YAZ: Çıkış yapılıyor.\nHoşça kalın.\nSON", shape=oval];
 
   ask_amount [label="YAZ: Çekmek istediğiniz tutarı giriniz\nOKU tutar", shape=parallelogram];
@@ -32,7 +33,7 @@ Ad Soyad : Şevval Yıldız
   insufficient_balance [label="YAZ: Yetersiz bakiye\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
 
   check_daily [label="EGER (gunluk_cekilen + tutar) <= gunluk_limit ?", shape=diamond];
-  daily_limit_exceeded [label="YAZ: Günlük limit aşılıyor / Kalan: kalan_limit\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
+  daily_limit_exceeded [label="YAZ: Günlük limit aşıyor\nKalan: kalan_limit\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
 
   confirm [label="YAZ: Onaylıyor musunuz? (E/H)\nOKU onay", shape=parallelogram];
   cancel_tx [label="YAZ: İşlem onaylanmadı.\nİşlem iptal edildi.", shape=rectangle];
@@ -44,13 +45,64 @@ Ad Soyad : Şevval Yıldız
   no_receipt [label="YAZ: Makbuz tercih edilmedi.", shape=rectangle];
 
   ask_repeat [label="YAZ: Başka işlem yapmak ister misiniz? (E/H)\nOKU tekrar_cevap", shape=parallelogram];
-  loop_back [label="islem_tekrar = Evet -> ana menüye dön", shape=rectangle];
-
   end_node [label="Kartınızı alınız.\nHoşça kalın.\nSON", shape=oval];
 
-  // Başlangıç akışı
-  start -> read_card -> init_vars -> pin_prompt -> check_pin;
+  // Kenarlar / akış
+  start -> read_card;
+  read_card -> init_vars;
+  init_vars -> pin_prompt;
+  pin_prompt -> check_pin;
 
-  // PIN doğrulama dalları
-  check_pin -_
- 
+  check_pin -> pin_ok [label="Evet"];
+  check_pin -> pin_failed [label="Hayır"];
+
+  pin_ok -> main_menu;
+
+  pin_failed -> card_block [label="kalan_hak = 0"];
+  pin_failed -> pin_prompt [label="kalan_hak > 0"];
+
+  main_menu -> exit_node [label="secim = 2"];
+  main_menu -> ask_amount [label="secim = 1"];
+
+  ask_amount -> check_positive;
+
+  check_positive -> invalid_amount [label="Evet"]; // geçersiz tutar
+  check_positive -> check_multiple20 [label="Hayır"];
+
+  invalid_amount -> ask_amount [label="cevap = Evet"];
+  invalid_amount -> end_node [label="cevap = Hayır"];
+
+  check_multiple20 -> not_multiple20 [label="Hayır"]; // MOD20 != 0
+  check_multiple20 -> check_balance [label="Evet"];
+
+  not_multiple20 -> ask_amount [label="cevap = Evet"];
+  not_multiple20 -> end_node [label="cevap = Hayır"];
+
+  check_balance -> insufficient_balance [label="Evet"];
+  check_balance -> check_daily [label="Hayır"];
+
+  insufficient_balance -> ask_amount [label="cevap = Evet"];
+  insufficient_balance -> end_node [label="cevap = Hayır"];
+
+  check_daily -> daily_limit_exceeded [label="Hayır"]; // aşıyor
+  check_daily -> confirm [label="Evet"];
+
+  daily_limit_exceeded -> ask_amount [label="cevap = Evet"];
+  daily_limit_exceeded -> end_node [label="cevap = Hayır"];
+
+  confirm -> perform_tx [label="onay = Evet"];
+  confirm -> cancel_tx [label="onay = Hayır"];
+
+  cancel_tx -> ask_repeat;
+
+  perform_tx -> receipt_prompt;
+
+  receipt_prompt -> print_receipt [label="Evet"];
+  receipt_prompt -> no_receipt [label="Hayır"];
+
+  print_receipt -> ask_repeat;
+  no_receipt -> ask_repeat;
+
+  ask_repeat -> main_menu [label="Evet"];
+  ask_repeat -> end_node [label="Hayır"];
+}
