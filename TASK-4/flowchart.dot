@@ -1,0 +1,61 @@
+digraph OgrenciDersKayit {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+
+    Basla [label="Başla"];
+    OgrenciGiris [label="Öğrenci Girişi\n(ÖğrenciNo + Şifre)"];
+    GirisKontrol [label="Giriş doğru mu?", shape=diamond];
+    HataGiris [label="Hata: Giriş yanlış", shape=box, style=filled, color=red];
+    
+    DersListe [label="Ders Listesini Görüntüle\n(Döngü)"];
+    DersSecimi [label="Ders seç"];
+    KontenjanKontrol [label="Kontenjan dolu mu?", shape=diamond];
+    OnKosulKontrol [label="Ön koşul dersleri tamamlandı mı?", shape=diamond];
+    ZamanCakis [label="Zaman çakışması var mı?", shape=diamond];
+    KrediKontrol [label="Toplam kredi ≤ 35?", shape=diamond];
+    DanismanOnayiKontrol [label="GPA < 2.5 ve danışman onayı gerekli mi?", shape=diamond];
+    DanismanOnayi [label="Danışman onayı al"];
+    
+    DersEkle [label="Dersi ekle\nToplam krediyi güncelle"];
+    DahaDers [label="Başka ders eklemek istiyor mu?", shape=diamond];
+    
+    KayitOzeti [label="Kayıt özeti göster"];
+    Onay [label="Kayıt onayı al", shape=diamond];
+    KayitBasarili [label="Kayıt başarılı", style=filled, color=lightgreen];
+    KayitIptal [label="Kayıt iptal", style=filled, color=red];
+    
+    Bitir [label="Bitir"];
+
+    // Akış bağlantıları
+    Basla -> OgrenciGiris;
+    OgrenciGiris -> GirisKontrol;
+    GirisKontrol -> DersListe [label="Evet"];
+    GirisKontrol -> HataGiris [label="Hayır"];
+    HataGiris -> Bitir;
+
+    DersListe -> DersSecimi;
+    DersSecimi -> KontenjanKontrol;
+    KontenjanKontrol -> OnKosulKontrol [label="Hayır"];
+    KontenjanKontrol -> DersSecimi [label="Evet, dolu, tekrar seç"];
+    OnKosulKontrol -> ZamanCakis [label="Evet"];
+    OnKosulKontrol -> DersSecimi [label="Hayır"];
+    ZamanCakis -> KrediKontrol [label="Hayır"];
+    ZamanCakis -> DersSecimi [label="Evet"];
+    KrediKontrol -> DanismanOnayiKontrol [label="Evet"];
+    KrediKontrol -> DersSecimi [label="Hayır"];
+    DanismanOnayiKontrol -> DanismanOnayi [label="Evet"];
+    DanismanOnayiKontrol -> DersEkle [label="Hayır"];
+    DanismanOnayi -> DersSecimi [label="Onay verilmedi"];
+    DanismanOnayi -> DersEkle [label="Onay verildi"];
+    
+    DersEkle -> DahaDers;
+    DahaDers -> DersSecimi [label="Evet"];
+    DahaDers -> KayitOzeti [label="Hayır"];
+    
+    KayitOzeti -> Onay;
+    Onay -> KayitBasarili [label="Onaylandı"];
+    Onay -> KayitIptal [label="Onaylanmadı"];
+    
+    KayitBasarili -> Bitir;
+    KayitIptal -> Bitir;
+}
