@@ -1,0 +1,54 @@
+digraph SmartHomeSecurity {
+    rankdir=TB;
+    node [shape=box, style=rounded, fontname="Arial"];
+
+    Start [label="Başla"];
+    CheckSystem [label="Sistem aktif mi?"];
+    ReadSensors [label="Sensör verilerini oku"];
+    
+    MotionDetected [label="Hareket sensörü algıladı mı?", shape=diamond];
+    DoorWindowDetected [label="Kapı/Pencere sensörü algıladı mı?", shape=diamond];
+    
+    OwnerHome [label="Ev sahibi evde mi?", shape=diamond];
+    ResetAlarm [label="Alarmı sıfırla"];
+    
+    SetAlarmLevel [label="Alarm seviyesini belirle"];
+    ActivateCamera [label="Kamera aktivasyonu"];
+    SendNotification [label="Bildirim gönder"];
+    
+    AlarmLevel1 [label="Seviye 1 (Düşük): App bildirimi"];
+    AlarmLevel2 [label="Seviye 2 (Orta): App + SMS"];
+    AlarmLevel3 [label="Seviye 3 (Yüksek): App + SMS + Email + Kamera kaydı"];
+    
+    Wait [label="Bekle ve tekrar kontrol et"];
+    SystemOff [label="Sistem devre dışı"];
+    End [label="Bitir"];
+
+    Start -> CheckSystem;
+    CheckSystem -> ReadSensors [label="Evet"];
+    CheckSystem -> SystemOff [label="Hayır"];
+
+    ReadSensors -> MotionDetected;
+    ReadSensors -> DoorWindowDetected;
+
+    MotionDetected -> OwnerHome [label="Evet"];
+    MotionDetected -> SetAlarmLevel [label="Hayır"];
+    
+    DoorWindowDetected -> OwnerHome [label="Evet"];
+    DoorWindowDetected -> SetAlarmLevel [label="Hayır"];
+
+    OwnerHome -> ResetAlarm [label="Evet"];
+    OwnerHome -> SetAlarmLevel [label="Hayır"];
+
+    SetAlarmLevel -> ActivateCamera;
+    ActivateCamera -> SendNotification;
+
+    SendNotification -> AlarmLevel1 [label="Seviye 1"];
+    SendNotification -> AlarmLevel2 [label="Seviye 2"];
+    SendNotification -> AlarmLevel3 [label="Seviye 3"];
+
+    AlarmLevel1 -> Wait;
+    AlarmLevel2 -> Wait;
+    AlarmLevel3 -> Wait;
+
+    Wait -> ReadSensors;
