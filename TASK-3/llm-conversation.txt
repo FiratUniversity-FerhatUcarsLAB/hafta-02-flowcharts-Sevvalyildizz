@@ -1,0 +1,188 @@
+Hastane randevu alma ve tahlil sonuclarına erişim sisteminii modellicezz                                            Sistem gereksinimleri                                                                                                                                  1- hasta kimlik doğrulama (TC no ile)                                                                                                                  2- işlem secimi 1- Randevu al 2- Tahlil sonucu gör (koşul)                                                                                     3- Randevu modülü: Doktor listesi , poliklinik seçimi , uygun saatler (döngü)                                                         4- Randevu onayı ve sms gönderimi                                                                                                                           5- Tahlil modülü : Tahlil var mı kontrolü (koşul)                                                                                                         6- Sonuç hazır mı kontorlü(koşul)                                                                                                                                 7- Sonuç görüntüleme veya bekleme mesajı                                                                                                            8-  Sonucları PDF indir seçeneği                                                                                                                             9- Başka işlem yapmak ister misiniz (döngü)                                                                                                  bana bunun pseudocode olarak yazar mısın
+ChatGPT:
+
+Tabii! Sana verdiğin gereksinimleri temel alarak hastane randevu ve tahlil sistemi için pseudocode yazabilirim. Bunu adım adım ve anlaşılır şekilde hazırlayalım:
+
+Başla
+
+Hasta Kimlik Doğrulama:
+    TC_no = Kullanıcıdan al
+    Eğer TC_no doğru ise
+        Devam et
+    Aksi halde
+        "Kimlik doğrulama başarısız" mesajı
+        Bitir
+
+İşlem Döngüsü:
+    Yap
+        İşlem = Kullanıcıdan al (1: Randevu al, 2: Tahlil sonucu gör)
+
+        Eğer İşlem = 1 ise   # Randevu Modülü
+            Doktor_Listesi = Göster
+            Poliklinik = Kullanıcıdan seç
+            Uygun_Saatler = Göster
+            Saat = Kullanıcıdan seç
+            Randevu_Onayla
+            SMS_Gönder
+            "Randevu başarılı" mesajı
+
+        Eğer İşlem = 2 ise   # Tahlil Modülü
+            Eğer tahlil var mı kontrolü doğru ise
+                Eğer sonuç hazır ise
+                    Sonuçları Göster
+                    PDF_İndir seçeneği sun
+                Aksi halde
+                    "Sonuçlar henüz hazır değil" mesajı
+            Aksi halde
+                "Tahlil bulunamadı" mesajı
+
+        Başka işlem yapmak ister misiniz? (E/H)
+    Döngü sonu: Kullanıcı Hayır derse çık
+
+Bitir
+
+
+Bu pseudocode, senin verdiğin koşul ve döngü gereksinimlerini kapsıyor.
+
+İstersen ben bunu DOT (Graphviz) diyagramı haline de getirip görselleştirebilirim, böylece akış diyagramı gibi de görebilirsin.
+
+Bunu yapayım mı?
+
+Şunu dedin:
+adım adım detaylı bir şekilde yaz
+ChatGPT:
+
+Tabii! O zaman sana hastane randevu ve tahlil sistemi için pseudocode’u adım adım, detaylı ve açıklamalı şekilde yazayım. Her adımı mantık sırasına göre numaralandıracağım:
+
+Hastane Randevu ve Tahlil Sistemi – Detaylı Pseudocode
+1. Başla
+
+2. Hasta Kimlik Doğrulama:
+    a. Kullanıcıdan TC_no al
+    b. Eğer TC_no veritabanında varsa:
+           "Kimlik doğrulama başarılı" mesajı
+           Devam et
+       Aksi halde:
+           "Kimlik doğrulama başarısız" mesajı
+           Bitir
+
+3. İşlem Döngüsü Başlat:
+    Döngü başı:
+        a. Kullanıcıya işlem seçeneği sun:
+            1: Randevu Al
+            2: Tahlil Sonucu Gör
+
+4. Eğer Kullanıcı İşlem = 1 (Randevu Al) ise:
+    a. Doktor listesini göster
+    b. Kullanıcıdan poliklinik seçimi al
+    c. Seçilen polikliniğe uygun saatleri göster
+    d. Kullanıcıdan randevu saati seçimi al
+    e. Randevuyu veritabanına kaydet
+    f. Kullanıcıya "Randevu başarılı" mesajı göster
+    g. SMS gönderimi yap
+
+5. Eğer Kullanıcı İşlem = 2 (Tahlil Sonucu Gör) ise:
+    a. Veritabanında hastaya ait tahlil var mı kontrol et
+        Eğer tahlil yoksa:
+            "Tahlil bulunamadı" mesajı göster
+        Eğer tahlil varsa:
+            Sonuç hazır mı kontrol et
+                Eğer sonuç hazırsa:
+                    Sonuçları ekranda göster
+                    PDF indir seçeneği sun
+                Eğer sonuç hazır değilse:
+                    "Sonuçlar henüz hazır değil" mesajı göster
+
+6. Kullanıcıya sor:
+    "Başka işlem yapmak ister misiniz? (E/H)"
+    Eğer Evet ise:
+        Döngü başına dön
+    Eğer Hayır ise:
+        Döngüyü bitir
+
+7. Bitir
+
+
+💡 Notlar / Açıklamalar:
+
+Kimlik doğrulama bir koşul ile yapılır.
+
+Randevu ve tahlil modüllerinde hem koşul hem de döngü kullanılmıştır.
+
+PDF indirme ve SMS gönderimi, işlem tamamlandıktan sonra ek özellik olarak eklenir.
+
+Döngü sayesinde kullanıcı birden fazla işlem yapabilir.
+
+İstersen ben bunu adım adım bir akış diyagramı haline getirip görsel olarak da gösterebilirim; böylece hem ödev hem de sunum için hazır olur.
+
+Bunu yapayım mı?
+
+Şunu dedin:
+bunu dot codu olarak yapar mısın
+ChatGPT:
+
+Tabii! Şimdi sana detaylı pseudocode’u Graphviz DOT formatında akış diyagramı olarak çevireceğim. Bu kodu Graphviz veya online DOT editor’lerde çalıştırırsan, tam bir görsel akış diyagramı elde edebilirsin.
+
+digraph HastaneSistemi {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+
+    Basla [label="Başla"];
+    KimlikDogrulama [label="Hasta Kimlik Doğrulama\n(TC No)"];
+    DogruTC [label="Kimlik doğrulama başarılı"];
+    YanlisTC [label="Kimlik doğrulama başarısız"];
+    
+    IslemSecim [label="İşlem Seçimi\n1: Randevu Al\n2: Tahlil Sonucu Gör"];
+    
+    RandevuModul [label="Randevu Modülü:\n- Doktor listesi\n- Poliklinik seçimi\n- Saat seçimi"];
+    RandevuOnay [label="Randevu Onayı ve SMS Gönderimi"];
+    
+    TahlilKontrol [label="Tahlil var mı kontrolü?"];
+    TahlilYok [label="Tahlil bulunamadı"];
+    SonucHazirKontrol [label="Sonuç hazır mı kontrolü?"];
+    SonucGoster [label="Sonuçları göster\nPDF indir seçeneği"];
+    SonucBekle [label="Sonuçlar henüz hazır değil"];
+    
+    BaskaIslem [label="Başka işlem yapmak ister misiniz?\n(E/H)"];
+    Bitir [label="Bitir"];
+
+    // Akış
+    Basla -> KimlikDogrulama;
+    KimlikDogrulama -> DogruTC [label="TC doğru"];
+    KimlikDogrulama -> YanlisTC [label="TC yanlış"];
+    YanlisTC -> Bitir;
+    
+    DogruTC -> IslemSecim;
+
+    // İşlem seçimleri
+    IslemSecim -> RandevuModul [label="1: Randevu Al"];
+    IslemSecim -> TahlilKontrol [label="2: Tahlil Sonucu Gör"];
+
+    // Randevu akışı
+    RandevuModul -> RandevuOnay;
+    RandevuOnay -> BaskaIslem;
+
+    // Tahlil akışı
+    TahlilKontrol -> TahlilYok [label="Hayır"];
+    TahlilKontrol -> SonucHazirKontrol [label="Evet"];
+    SonucHazirKontrol -> SonucGoster [label="Evet"];
+    SonucHazirKontrol -> SonucBekle [label="Hayır"];
+    
+    SonucGoster -> BaskaIslem;
+    SonucBekle -> BaskaIslem;
+
+    // Döngü
+    BaskaIslem -> IslemSecim [label="Evet"];
+    BaskaIslem -> Bitir [label="Hayır"];
+}
+
+
+💡 Özellikler:
+
+Koşullar (if) için label kullanıldı: “Evet / Hayır”.
+
+Döngü, “Başka işlem yapmak ister misiniz?” ile gösterildi.
+
+Randevu ve tahlil modülleri ayrı bloklar halinde.
+
+İstersen ben bunu daha görsel olarak renkli ve şekilli hâle getirip, Randevu ve Tahlil bloklarını farklı renklerle vurgulayabilirim.
