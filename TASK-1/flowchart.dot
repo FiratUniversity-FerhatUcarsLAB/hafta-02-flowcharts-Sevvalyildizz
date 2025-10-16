@@ -1,0 +1,56 @@
+Ad Soyad : Şevval Yıldız
+Öğrenci No: 250541025
+
+ digraph ATM {
+  rankdir=TB;
+  node [fontname="Helvetica"];
+  edge [fontname="Helvetica"];
+
+  // Node şekilleri
+  start [label="BAŞLA", shape=oval];
+  read_card [label="YAZ: Kartı takınız...\nOKU kart", shape=parallelogram];
+  init_vars [label="Hesap verileri başlat\n(PIN, bakiye, günlük limit,\n günlük_çekilen=0, max_hak=3)", shape=rectangle];
+
+  pin_prompt [label="YAZ: PIN giriniz\nOKU girilen_PIN", shape=parallelogram];
+  check_pin [label="EGER girilen_PIN = kayıtlı_PIN ?", shape=diamond];
+  pin_ok [label="YAZ: PIN doğrulandı.", shape=rectangle];
+  pin_failed [label="kalan_hak--\nEGER kalan_hak>0 ?", shape=diamond];
+  card_block [label="YAZ: Kartınız bloke edildi.\nSON", shape=oval];
+
+  main_menu [label="YAZ: İşlem seçiniz\n1) Para Çekme 2) Çıkış\nOKU secim", shape=parallelogram];
+  exit_node [label="YAZ: Çıkış yapılıyor.\nHoşça kalın.\nSON", shape=oval];
+
+  ask_amount [label="YAZ: Çekmek istediğiniz tutarı giriniz\nOKU tutar", shape=parallelogram];
+
+  check_positive [label="EGER tutar <= 0 ?", shape=diamond];
+  invalid_amount [label="YAZ: Geçersiz tutar\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
+
+  check_multiple20 [label="EGER tutar MOD 20 = 0 ?", shape=diamond];
+  not_multiple20 [label="YAZ: Tutar 20 TL'nin katı olmalı\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
+
+  check_balance [label="EGER tutar > hesap_bakiye ?", shape=diamond];
+  insufficient_balance [label="YAZ: Yetersiz bakiye\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
+
+  check_daily [label="EGER (gunluk_cekilen + tutar) <= gunluk_limit ?", shape=diamond];
+  daily_limit_exceeded [label="YAZ: Günlük limit aşılıyor / Kalan: kalan_limit\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
+
+  confirm [label="YAZ: Onaylıyor musunuz? (E/H)\nOKU onay", shape=parallelogram];
+  cancel_tx [label="YAZ: İşlem onaylanmadı.\nİşlem iptal edildi.", shape=rectangle];
+
+  perform_tx [label="hesap_bakiye -= tutar\ngunluk_cekilen += tutar\nYAZ: Lütfen paranızı alınız...\nYAZ: tutar TL verildi.", shape=rectangle];
+
+  receipt_prompt [label="YAZ: Makbuz almak ister misiniz? (E/H)\nOKU makbuz", shape=parallelogram];
+  print_receipt [label="YAZ: Makbuz yazdırılıyor\n(Makbuz: çekilen tutar, kalan bakiye, bugün çekilen toplam)", shape=rectangle];
+  no_receipt [label="YAZ: Makbuz tercih edilmedi.", shape=rectangle];
+
+  ask_repeat [label="YAZ: Başka işlem yapmak ister misiniz? (E/H)\nOKU tekrar_cevap", shape=parallelogram];
+  loop_back [label="islem_tekrar = Evet -> ana menüye dön", shape=rectangle];
+
+  end_node [label="Kartınızı alınız.\nHoşça kalın.\nSON", shape=oval];
+
+  // Başlangıç akışı
+  start -> read_card -> init_vars -> pin_prompt -> check_pin;
+
+  // PIN doğrulama dalları
+  check_pin -_
+ 
