@@ -1,0 +1,72 @@
+digraph E_Ticaret_Sistemi {
+    rankdir=TB;
+    node [shape=rectangle, style=rounded, fontsize=10];
+
+    START [label="BAŞLA", shape=ellipse, style=filled, fillcolor=lightgreen];
+    LOGIN [label="Kullanıcı adı ve şifre gir"];
+    LOGIN_CHECK [label="Giriş bilgileri doğru mu?", shape=diamond];
+    EXIT [label="Hatalı giriş! Sistemden çık", shape=rectangle, fillcolor=lightcoral, style=filled];
+    CATEGORIES [label="Ürün kategorilerini göster"];
+    CHOOSE_CAT [label="Kategori seç"];
+    CAT_EXIT [label="Kategori: 4 (Çıkış)?", shape=diamond];
+    SHOW_PRODUCTS [label="Seçilen kategori ürünlerini listele"];
+    SELECT_PRODUCT [label="Ürün ID gir (0 = geri dön)"];
+    STOCK_CHECK [label="Stok var mı?", shape=diamond];
+    ADD_CART [label="Ürün sepete eklendi"];
+    NO_STOCK [label="Stok yok!"];
+    CART_MENU [label="Sepet menüsü:\n1-Sil\n2-Adet değiştir\n3-İndirim kodu\n4-Ödemeye geç"];
+    DISCOUNT_CHECK [label="İndirim kodu geçerli mi?", shape=diamond];
+    APPLY_DISCOUNT [label="%10 indirim uygulandı"];
+    INVALID_CODE [label="Geçersiz indirim kodu"];
+    MIN_CHECK [label="Sepet toplamı ≥ 50 TL mi?", shape=diamond];
+    MIN_FAIL [label="Sepet toplamı yetersiz!"];
+    CARGO_CHECK [label="Sepet ≥ 200 TL mi?", shape=diamond];
+    FREE_SHIP [label="Kargo ücretsiz"];
+    PAID_SHIP [label="Kargo 29.90 TL"];
+    PAYMENT_METHOD [label="Ödeme yöntemi seç\n(1-Kredi Kartı, 2-Banka Kartı, 3-Havale)"];
+    PAYMENT_VALID [label="Ödeme yöntemi geçerli mi?", shape=diamond];
+    CARD_PAYMENT [label="Kart bilgilerini gir"];
+    EFT_PAYMENT [label="IBAN göster\nHavale yap"];
+    PAYMENT_FAIL [label="Geçersiz ödeme yöntemi!"];
+    ORDER_CONFIRM [label="Sipariş onaylanıyor..."];
+    SUCCESS [label="Sipariş başarıyla oluşturuldu!", shape=ellipse, style=filled, fillcolor=lightgreen];
+
+    // Akış bağlantıları
+    START -> LOGIN -> LOGIN_CHECK;
+    LOGIN_CHECK -> EXIT [label="HAYIR"];
+    LOGIN_CHECK -> CATEGORIES [label="EVET"];
+    CATEGORIES -> CHOOSE_CAT -> CAT_EXIT;
+    CAT_EXIT -> SHOW_PRODUCTS [label="HAYIR"];
+    CAT_EXIT -> CART_MENU [label="EVET"];
+    SHOW_PRODUCTS -> SELECT_PRODUCT;
+    SELECT_PRODUCT -> STOCK_CHECK;
+    STOCK_CHECK -> NO_STOCK [label="HAYIR"];
+    STOCK_CHECK -> ADD_CART [label="EVET"];
+    ADD_CART -> CATEGORIES;
+    NO_STOCK -> CATEGORIES;
+
+    CART_MENU -> DISCOUNT_CHECK [label="3. seçenek"];
+    DISCOUNT_CHECK -> APPLY_DISCOUNT [label="EVET"];
+    DISCOUNT_CHECK -> INVALID_CODE [label="HAYIR"];
+    APPLY_DISCOUNT -> MIN_CHECK;
+    INVALID_CODE -> MIN_CHECK;
+
+    MIN_CHECK -> MIN_FAIL [label="HAYIR"];
+    MIN_CHECK -> CARGO_CHECK [label="EVET"];
+    CARGO_CHECK -> FREE_SHIP [label="EVET"];
+    CARGO_CHECK -> PAID_SHIP [label="HAYIR"];
+    FREE_SHIP -> PAYMENT_METHOD;
+    PAID_SHIP -> PAYMENT_METHOD;
+
+    PAYMENT_METHOD -> PAYMENT_VALID;
+    PAYMENT_VALID -> CARD_PAYMENT [label="Kredi/Banka"];
+    PAYMENT_VALID -> EFT_PAYMENT [label="Havale"];
+    PAYMENT_VALID -> PAYMENT_FAIL [label="Geçersiz"];
+
+    CARD_PAYMENT -> ORDER_CONFIRM;
+    EFT_PAYMENT -> ORDER_CONFIRM;
+    ORDER_CONFIRM -> SUCCESS;
+
+    MIN_FAIL -> CART_MENU;
+    PAYMENT_FAIL -> EXIT;
+}
