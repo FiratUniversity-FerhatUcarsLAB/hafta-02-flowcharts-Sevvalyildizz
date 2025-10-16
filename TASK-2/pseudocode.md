@@ -1,94 +1,116 @@
 BAŞLA
 
-// Kullanıcı girişi kontrolü
-EĞER kullanıcı_girişi = DOĞRU İSE
-    YAZ "Hoş geldiniz!"
+// 1. Kullanıcı Girişi
+YAZ "Kullanıcı adı giriniz:"
+KULLANICI_ADI ← GİRİŞ AL
+YAZ "Şifre giriniz:"
+ŞİFRE ← GİRİŞ AL
+
+EĞER (KULLANICI_ADI ve ŞİFRE doğruysa) İSE
+    YAZ "Giriş başarılı. Hoş geldiniz!"
 DEĞİLSE
-    YAZ "Lütfen giriş yapınız."
-    GİRİŞ YAP()
-    EĞER giriş_başarılı = YANLIŞ İSE
-        YAZ "Giriş başarısız, sistemden çıkılıyor."
-        BİTİR
-    SON
-SON
-
-// Ürün kategorilerinde gezinme (döngü)
-TEKRARLA
-    YAZ "Lütfen bir kategori seçin:"
-    kategori ← KATEGORİ_SEÇ()
-    ürün_listesi ← KATEGORİDEKİ_ÜRÜNLERİ_GÖSTER(kategori)
-    ürün ← ÜRÜN_SEÇ(ürün_listesi)
-
-    // Stok kontrolü (koşul)
-    EĞER ürün.stok > 0 İSE
-        YAZ "Ürün sepete eklendi."
-        SEPETE_EKLE(ürün)
-    DEĞİLSE
-        YAZ "Seçilen ürün stokta yok."
-    SON
-
-    YAZ "Başka ürün eklemek ister misiniz? (E/H)"
-    cevap ← GİRİŞ_AL()
-SONA KADAR TEKRARLA cevap = "E"
-
-// Sepeti görüntüleme ve düzenleme (döngü)
-TEKRARLA
-    SEPETİ_GÖSTER()
-    YAZ "Sepeti düzenlemek ister misiniz? (E/H)"
-    düzenle ← GİRİŞ_AL()
-    EĞER düzenle = "E" İSE
-        SEPET_DÜZENLE()
-    SON
-SONA KADAR TEKRARLA düzenle = "E"
-
-// İndirim kodu kontrolü
-YAZ "İndirim kodunuz var mı? (E/H)"
-cevap ← GİRİŞ_AL()
-EĞER cevap = "E" İSE
-    kod ← GİRİŞ_AL("İndirim kodunu giriniz: ")
-    EĞER KOD_GEÇERLİ(kod) İSE
-        İNDİRİM_UYGULA(kod)
-        YAZ "İndirim uygulandı."
-    DEĞİLSE
-        YAZ "Geçersiz kod."
-    SON
-SON
-
-// Minimum 50 TL kontrolü
-EĞER SEPET_TOPLAMI < 50 İSE
-    YAZ "Minimum sipariş tutarı 50 TL olmalıdır."
+    YAZ "Kullanıcı adı veya şifre hatalı! Çıkılıyor..."
     BİTİR
 SON
 
-// Kargo ücreti hesaplama
+// 2. Ürün Kategorileri Arasında Gezinme
+TEKRAR
+    YAZ "Kategoriler: 1-Elektronik, 2-Giyim, 3-Kitap, 4-Çıkış"
+    KATEGORİ ← GİRİŞ AL
+    
+    EĞER KATEGORİ = 4 İSE
+        ÇIKIŞ DÖNGÜSÜ
+    DEĞİLSE
+        YAZ "Seçilen kategoriye ait ürünler listeleniyor..."
+        // Ürün Listesi Göster
+        YAZ "Sepete eklemek istediğiniz ürün ID'sini giriniz (veya 0: kategoriye dön):"
+        ÜRÜN_ID ← GİRİŞ AL
+        
+        EĞER ÜRÜN_ID = 0 İSE
+            DEVAM ET
+        DEĞİLSE
+            // 3. Stok Kontrolü
+            STOK ← STOK_KONTROL(ÜRÜN_ID)
+            EĞER STOK > 0 İSE
+                YAZ "Ürün sepete eklendi."
+                SEPETE_EKLE(ÜRÜN_ID)
+            DEĞİLSE
+                YAZ "Üzgünüz, ürün stokta yok!"
+            SON
+        SON
+    SON
+TEKRARLA
+
+// 4. Sepeti Görüntüleme ve Düzenleme
+TEKRAR
+    YAZ "Sepetiniz:"
+    SEPET_GÖSTER()
+    YAZ "1-Ürün Sil, 2-Adet Değiştir, 3-İndirim Kodu Uygula, 4-Ödemeye Geç"
+    SEÇİM ← GİRİŞ AL
+
+    EĞER SEÇİM = 1 İSE
+        YAZ "Silmek istediğiniz ürün ID'sini giriniz:"
+        ÜRÜN_ID ← GİRİŞ AL
+        SEPETTEN_SİL(ÜRÜN_ID)
+    EĞER SEÇİM = 2 İSE
+        YAZ "Adet değiştirilecek ürün ID'sini giriniz:"
+        ÜRÜN_ID ← GİRİŞ AL
+        YAZ "Yeni adet:"
+        ADET ← GİRİŞ AL
+        SEPET_ADET_GÜNCELLE(ÜRÜN_ID, ADET)
+    EĞER SEÇİM = 3 İSE
+        YAZ "İndirim kodunu giriniz:"
+        KOD ← GİRİŞ AL
+        EĞER KOD = "INDIRIM10" İSE
+            SEPET_TOPLAMI ← SEPET_TOPLAMI * 0.9
+            YAZ "10% indirim uygulandı."
+        DEĞİLSE
+            YAZ "Geçersiz indirim kodu."
+        SON
+    SON
+TEKRARLA SEÇİM ≠ 4 OLDUĞU SÜRECE
+
+// 5. Minimum Tutar Kontrolü
+EĞER SEPET_TOPLAMI < 50 İSE
+    YAZ "Ödeme için sepet toplamı en az 50 TL olmalıdır."
+    GİT SEPET_EKRANI
+SON
+
+// 6. Kargo Ücreti Hesaplama
 EĞER SEPET_TOPLAMI ≥ 200 İSE
-    kargo_ücreti ← 0
-    YAZ "Kargo ücretsiz."
+    KARGO ← 0
+    YAZ "Kargo ücretsiz!"
 DEĞİLSE
-    kargo_ücreti ← 30
-    YAZ "Kargo ücreti 30 TL eklendi."
+    KARGO ← 29.90
+    YAZ "Kargo ücreti: " + KARGO + " TL"
 SON
 
-// Ödeme yöntemi seçimi
-YAZ "Ödeme yöntemi seçiniz: 1-Kredi Kartı, 2-Havale, 3-Kapıda Ödeme"
-ödeme ← GİRİŞ_AL()
+GENEL_TOPLAM ← SEPET_TOPLAMI + KARGO
 
-EĞER ödeme = 1 İSE
-    YAZ "Kredi kartı bilgilerini giriniz."
-    ÖDEME_YAP("Kredi Kartı")
-EĞER ödeme = 2 İSE
-    YAZ "Havale bilgileri gösteriliyor."
-    ÖDEME_YAP("Havale")
-EĞER ödeme = 3 İSE
-    YAZ "Kapıda ödeme seçildi."
-    ÖDEME_YAP("Kapıda Ödeme")
-SON
+// 7. Ödeme Yöntemi Seçimi
+YAZ "Ödeme Yöntemi Seçiniz: 1-Kredi Kartı, 2-Banka Kartı, 3-Havale/EFT"
+ÖDEME ← GİRİŞ AL
 
-// Sipariş onayı
-EĞER ÖDEME_BAŞARILI İSE
-    YAZ "Sipariş başarıyla oluşturuldu. Teşekkür ederiz!"
+EĞER ÖDEME = 1 VEYA 2 İSE
+    YAZ "Kart bilgilerini giriniz:"
+    YAZ "Kart numarası:"
+    KART_NO ← GİRİŞ AL
+    YAZ "Son kullanma tarihi:"
+    SKT ← GİRİŞ AL
+    YAZ "CVV:"
+    CVV ← GİRİŞ AL
+    YAZ "Ödeme işleniyor..."
+DEĞİLSE EĞER ÖDEME = 3 İSE
+    YAZ "IBAN: TR00 0000 0000 0000"
+    YAZ "Lütfen belirtilen hesaba havale yapınız."
 DEĞİLSE
-    YAZ "Ödeme başarısız. Lütfen tekrar deneyiniz."
+    YAZ "Geçersiz ödeme yöntemi!"
+    BİTİR
 SON
+
+// 8. Sipariş Onayı
+YAZ "Sipariş toplamı: " + GENEL_TOPLAM + " TL"
+YAZ "Sipariş onaylanıyor..."
+YAZ "Sipariş başarıyla oluşturuldu. Teşekkür ederiz!"
 
 BİTİR
