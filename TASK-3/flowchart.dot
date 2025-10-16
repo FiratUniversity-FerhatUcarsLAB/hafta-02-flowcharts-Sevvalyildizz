@@ -1,0 +1,52 @@
+digraph HastaneSistemi {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+
+    Basla [label="Başla"];
+    KimlikDogrulama [label="Hasta Kimlik Doğrulama\n(TC No)"];
+    DogruTC [label="Kimlik doğrulama başarılı"];
+    YanlisTC [label="Kimlik doğrulama başarısız"];
+    
+    IslemSecim [label="İşlem Seçimi\n1: Randevu Al\n2: Tahlil Sonucu Gör"];
+    
+    RandevuModul [label="Randevu Modülü:\n- Doktor listesi\n- Poliklinik seçimi\n- Saat seçimi"];
+    RandevuOnay [label="Randevu Onayı ve SMS Gönderimi"];
+    
+    TahlilKontrol [label="Tahlil var mı kontrolü?"];
+    TahlilYok [label="Tahlil bulunamadı"];
+    SonucHazirKontrol [label="Sonuç hazır mı kontrolü?"];
+    SonucGoster [label="Sonuçları göster\nPDF indir seçeneği"];
+    SonucBekle [label="Sonuçlar henüz hazır değil"];
+    
+    BaskaIslem [label="Başka işlem yapmak ister misiniz?\n(E/H)"];
+    Bitir [label="Bitir"];
+
+    // Akış
+    Basla -> KimlikDogrulama;
+    KimlikDogrulama -> DogruTC [label="TC doğru"];
+    KimlikDogrulama -> YanlisTC [label="TC yanlış"];
+    YanlisTC -> Bitir;
+    
+    DogruTC -> IslemSecim;
+
+    // İşlem seçimleri
+    IslemSecim -> RandevuModul [label="1: Randevu Al"];
+    IslemSecim -> TahlilKontrol [label="2: Tahlil Sonucu Gör"];
+
+    // Randevu akışı
+    RandevuModul -> RandevuOnay;
+    RandevuOnay -> BaskaIslem;
+
+    // Tahlil akışı
+    TahlilKontrol -> TahlilYok [label="Hayır"];
+    TahlilKontrol -> SonucHazirKontrol [label="Evet"];
+    SonucHazirKontrol -> SonucGoster [label="Evet"];
+    SonucHazirKontrol -> SonucBekle [label="Hayır"];
+    
+    SonucGoster -> BaskaIslem;
+    SonucBekle -> BaskaIslem;
+
+    // Döngü
+    BaskaIslem -> IslemSecim [label="Evet"];
+    BaskaIslem -> Bitir [label="Hayır"];
+}
