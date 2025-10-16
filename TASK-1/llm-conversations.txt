@@ -1,0 +1,435 @@
+Ad Soyad: Şevval Yıldız
+Öğrenci No: 250541025
+
+ATM para ¸cekme sistemi i¸cin detaylı pseudocode yazmanı istiyorum.
+S¸unları i¸cermeli: PIN do˘grulama (3 hak), bakiye kontrol¨u, tutar
+kontrol¨u (20 TL katları), g¨unl¨uk limit kontrol¨u, i¸slem tekrarı se¸cene˘gi. T¨um
+adımları BAS¸LA, OKU, YAZ, E˘GER-˙ISE, D¨ONG¨U yapılarıyla yaz
+ChatGPT:
+
+Harika — aşağıda istediğin tüm gereksinimleri (PIN doğrulama — 3 hak, bakiye kontrolü, tutar kontrolü (20 TL katları), günlük limit kontrolü, işlem tekrarı seçeneği) içeren detaylı pseudocode var. İstek üzerine tüm kontrol adımlarını açıkça gösterdim ve sadece BASLA, OKU, YAZ, EGER-ISE, DONGU gibi yapı isimlerini kullandım.
+
+BASLA
+
+# Değişkenlerin başlatılması
+YAZ "Kartı takınız..."
+OKU kart_ok  # (sadece akış için; gerçek sürümde kart verisi okunur)
+
+# Hesap verileri (örnek/başlangıç değerleri)
+account_PIN_doğru <- 1234          # sistemde kayıtlı PIN (örnek)
+hesap_bakiye <- 5000               # örnek bakiye (TL)
+gunluk_limit <- 2000               # günlük çekim limiti (TL)
+gunluk_cekilen <- 0                # bugünkü çekilen toplam (başlangıç)
+
+# PIN doğrulama - 3 hak
+max_hak <- 3
+kalan_hak <- max_hak
+pin_dogrulandi <- HAYIR
+
+DONGU (kalan_hak > 0) YAP
+    YAZ "Lütfen 4 haneli PIN'inizi giriniz:"
+    OKU girilen_PIN
+    EGER-ISE (girilen_PIN = account_PIN_doğru) O ZAMAN
+        pin_dogrulandi <- EVET
+        YAZ "PIN doğrulandı."
+        DUR  # PIN doğrulandı, döngüden çık
+    DEGILSE
+        kalan_hak <- kalan_hak - 1
+        EGER-ISE (kalan_hak > 0) O ZAMAN
+            YAZ "Hatalı PIN. Kalan hak: " + kalan_hak
+        DEGILSE
+            YAZ "Kartınız bloke edildi. Lütfen bankayla iletişime geçin."
+            # Kart bloke işlemi burada yapılır (sisteme bildirim vs.)
+            SON  # Program sonlanır veya ana menüye dönmez
+        BITIR_EGER
+    BITIR_EGER
+BITIR_DONGU
+
+EGER-ISE (pin_dogrulandi = HAYIR) O ZAMAN
+    SON  # PIN doğrulanmadıysa işlem sona erer
+BITIR_EGER
+
+# İşlem döngüsü - kullanıcı tekrar işlem yapmak isteyebilir
+islem_tekrar <- EVET
+DONGU (islem_tekrar = EVET) YAP
+
+    # Kullanıcıdan işlem seçimi (sadece para çekme için)
+    YAZ "İşlem seçiniz: 1) Para Çekme  2) Çıkış"
+    OKU secim
+    EGER-ISE (secim = 2) O ZAMAN
+        YAZ "Çıkış yapılıyor. Hoşça kalın."
+        islem_tekrar <- HAYIR
+        DUR
+    BITIR_EGER
+
+    # Para çekme adımları
+    YAZ "Çekmek istediğiniz tutarı giriniz (TL):"
+    OKU tutar
+
+    # Tutar geçerlilik kontrolleri
+    EGER-ISE (tutar <= 0) O ZAMAN
+        YAZ "Geçersiz tutar. Lütfen pozitif bir tutar girin."
+        # İşlemi tekrar sormak için döngüye geri dön
+        YAZ "Yeni işlem yapmak ister misiniz? (Evet/Hayır)"
+        OKU cevap1
+        EGER-ISE (cevap1 = "Evet" VEYA cevap1 = "evet" VEYA cevap1 = "E") O ZAMAN
+            islem_tekrar <- EVET
+            DUR
+        DEGILSE
+            islem_tekrar <- HAYIR
+            SON
+        BITIR_EGER
+    BITIR_EGER
+
+    # 20 TL katları kontrolü
+    EGER-ISE (tutar MOD 20 <> 0) O ZAMAN
+        YAZ "Tutar 20 TL'nin katı olmalıdır. Lütfen 20, 40, 60 ... gibi bir tutar girin."
+        YAZ "Yeni işlem yapmak ister misiniz? (Evet/Hayır)"
+        OKU cevap2
+        EGER-ISE (cevap2 = "Evet" VEYA cevap2 = "evet" VEYA cevap2 = "E") O ZAMAN
+            islem_tekrar <- EVET
+            DUR
+        DEGILSE
+            islem_tekrar <- HAYIR
+            SON
+        BITIR_EGER
+    BITIR_EGER
+
+    # Bakiye kontrolü
+    EGER-ISE (tutar > hesap_bakiye) O ZAMAN
+        YAZ "Yetersiz bakiye. Hesabınızda " + hesap_bakiye + " TL bulunmaktadır."
+        YAZ "Yeni işlem yapmak ister misiniz? (Evet/Hayır)"
+        OKU cevap3
+        EGER-ISE (cevap3 = "Evet" VEYA cevap3 = "evet" VEYA cevap3 = "E") O ZAMAN
+            islem_tekrar <- EVET
+            DUR
+        DEGILSE
+            islem_tekrar <- HAYIR
+            SON
+        BITIR_EGER
+    BITIR_EGER
+
+    # Günlük limit kontrolü
+    EGER-ISE ((gunluk_cekilen + tutar) > gunluk_limit) O ZAMAN
+        kalan_limit <- gunluk_limit - gunluk_cekilen
+        EGER-ISE (kalan_limit <= 0) O ZAMAN
+            YAZ "Bugün için çekebileceğiniz tutar bitmiştir. Günlük limit: " + gunluk_limit + " TL"
+        DEGILSE
+            YAZ "Günlük limit aşılıyor. Kalan çekilebilir tutar bugün için: " + kalan_limit + " TL"
+        BITIR_EGER
+
+        YAZ "Yeni işlem yapmak ister misiniz? (Evet/Hayır)"
+        OKU cevap4
+        EGER-ISE (cevap4 = "Evet" VEYA cevap4 = "evet" VEYA cevap4 = "E") O ZAMAN
+            islem_tekrar <- EVET
+            DUR
+        DEGILSE
+            islem_tekrar <- HAYIR
+            SON
+        BITIR_EGER
+    BITIR_EGER
+
+    # Tüm kontroller geçti -> işlem onayı
+    YAZ "İşlem onayı: " + tutar + " TL çekilecek. Onaylıyor musunuz? (Evet/Hayır)"
+    OKU onay
+    EGER-ISE (onay = "Evet" VEYA onay = "evet" VEYA onay = "E") O ZAMAN
+        # Hesap güncellemeleri
+        hesap_bakiye <- hesap_bakiye - tutar
+        gunluk_cekilen <- gunluk_cekilen + tutar
+
+        # Nakit hazırlama simülasyonu
+        YAZ "Lütfen paranızı alınız..."
+        YAZ tutar + " TL verildi."
+
+        # Makbuz seçeneği
+        YAZ "Makbuz almak ister misiniz? (Evet/Hayır)"
+        OKU makbuz
+        EGER-ISE (makbuz = "Evet" VEYA makbuz = "evet" VEYA makbuz = "E") O ZAMAN
+            YAZ "Makbuz yazdırılıyor..."
+            YAZ "Makbuz: Çekilen tutar: " + tutar + " TL, Kalan bakiye: " + hesap_bakiye + " TL, Bugün çekilen toplam: " + gunluk_cekilen + " TL"
+        DEGILSE
+            YAZ "Makbuz tercih edilmedi."
+        BITIR_EGER
+
+    DEGILSE
+        YAZ "İşlem onaylanmadı. Para çekme işlemi iptal edildi."
+    BITIR_EGER
+
+    # İşlem sonrası: tekrar ister mi?
+    YAZ "Başka işlem yapmak ister misiniz? (Evet/Hayır)"
+    OKU tekrar_cevap
+    EGER-ISE (tekrar_cevap = "Evet" VEYA tekrar_cevap = "evet" VEYA tekrar_cevap = "E") O ZAMAN
+        islem_tekrar <- EVET
+    DEGILSE
+        islem_tekrar <- HAYIR
+        YAZ "Kartınızı alınız. Hoşça kalın."
+        SON
+    BITIR_EGER
+
+BITIR_DONGU  # islem_tekrar döngüsü biter
+
+SON
+
+
+İstersen bu pseudocode'u:
+
+daha ayrıntılı akış diyagramına dönüştürebilirim,
+
+gerçek bir programlama diline (Python, Java, C# vb.) çevirebilirim,
+
+ya da PIN bloke ve kart iade gibi hata durumlarını daha gerçekçi şekilde (loglama, bankaya bildirim) genişletebilirim.
+
+Hangi formatı istersin devamında?
+
+Şunu dedin:
+bunu dot koduna cevir 
+ChatGPT:
+
+Tamam — pseudocode'daki bütün adımları ve dallanmaları içeren Graphviz DOT kodunu aşağıda veriyorum. Bu kodu bir .dot dosyasına yapıştırıp Graphviz ile (dot -Tpng dosya.dot -o flow.png gibi) görselleştirebilirsin.
+
+(Düğüm tipleri: oval = başlangıç/son, parallelogram = giriş/çıkış (OKU/YAZ), rectangle = işlem, diamond = karar.)
+
+digraph ATM {
+  rankdir=TB;
+  node [fontname="Helvetica"];
+  edge [fontname="Helvetica"];
+
+  // Node şekilleri
+  start [label="BAŞLA", shape=oval];
+  read_card [label="YAZ: Kartı takınız...\nOKU kart", shape=parallelogram];
+  init_vars [label="Hesap verileri başlat\n(PIN, bakiye, günlük limit,\n günlük_çekilen=0, max_hak=3)", shape=rectangle];
+
+  pin_prompt [label="YAZ: PIN giriniz\nOKU girilen_PIN", shape=parallelogram];
+  check_pin [label="EGER girilen_PIN = kayıtlı_PIN ?", shape=diamond];
+  pin_ok [label="YAZ: PIN doğrulandı.", shape=rectangle];
+  pin_failed [label="kalan_hak--\nEGER kalan_hak>0 ?", shape=diamond];
+  card_block [label="YAZ: Kartınız bloke edildi.\nSON", shape=oval];
+
+  main_menu [label="YAZ: İşlem seçiniz\n1) Para Çekme 2) Çıkış\nOKU secim", shape=parallelogram];
+  exit_node [label="YAZ: Çıkış yapılıyor.\nHoşça kalın.\nSON", shape=oval];
+
+  ask_amount [label="YAZ: Çekmek istediğiniz tutarı giriniz\nOKU tutar", shape=parallelogram];
+
+  check_positive [label="EGER tutar <= 0 ?", shape=diamond];
+  invalid_amount [label="YAZ: Geçersiz tutar\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
+
+  check_multiple20 [label="EGER tutar MOD 20 = 0 ?", shape=diamond];
+  not_multiple20 [label="YAZ: Tutar 20 TL'nin katı olmalı\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
+
+  check_balance [label="EGER tutar > hesap_bakiye ?", shape=diamond];
+  insufficient_balance [label="YAZ: Yetersiz bakiye\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
+
+  check_daily [label="EGER (gunluk_cekilen + tutar) <= gunluk_limit ?", shape=diamond];
+  daily_limit_exceeded [label="YAZ: Günlük limit aşılıyor / Kalan: kalan_limit\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
+
+  confirm [label="YAZ: Onaylıyor musunuz? (E/H)\nOKU onay", shape=parallelogram];
+  cancel_tx [label="YAZ: İşlem onaylanmadı.\nİşlem iptal edildi.", shape=rectangle];
+
+  perform_tx [label="hesap_bakiye -= tutar\ngunluk_cekilen += tutar\nYAZ: Lütfen paranızı alınız...\nYAZ: tutar TL verildi.", shape=rectangle];
+
+  receipt_prompt [label="YAZ: Makbuz almak ister misiniz? (E/H)\nOKU makbuz", shape=parallelogram];
+  print_receipt [label="YAZ: Makbuz yazdırılıyor\n(Makbuz: çekilen tutar, kalan bakiye, bugün çekilen toplam)", shape=rectangle];
+  no_receipt [label="YAZ: Makbuz tercih edilmedi.", shape=rectangle];
+
+  ask_repeat [label="YAZ: Başka işlem yapmak ister misiniz? (E/H)\nOKU tekrar_cevap", shape=parallelogram];
+  loop_back [label="islem_tekrar = Evet -> ana menüye dön", shape=rectangle];
+
+  end_node [label="Kartınızı alınız.\nHoşça kalın.\nSON", shape=oval];
+
+  // Başlangıç akışı
+  start -> read_card -> init_vars -> pin_prompt -> check_pin;
+
+  // PIN doğrulama dalları
+  check_pin -> pin_ok [label="Evet"];
+  check_pin -> pin_failed [label="Hayır"];
+
+  pin_ok -> main_menu;
+
+  pin_failed -> card_block [label="kalan_hak = 0", style=dashed];
+  pin_failed -> pin_prompt [label="kalan_hak > 0"];
+
+  // Ana menü seçimleri
+  main_menu -> exit_node [label="secim = 2"];
+  main_menu -> ask_amount [label="secim = 1"];
+
+  // Tutar kontrolleri
+  ask_amount -> check_positive;
+  check_positive -> invalid_amount [label="Evet"]; // geçersiz
+  check_positive -> check_multiple20 [label="Hayır"];
+
+  invalid_amount -> ask_amount [label="cevap = Evet"];
+  invalid_amount -> end_node [label="cevap = Hayır"];
+
+  check_multiple20 -> not_multiple20 [label="Hayır"]; // yani MOD20 != 0
+  check_multiple20 -> check_balance [label="Evet"];
+
+  not_multiple20 -> ask_amount [label="cevap = Evet"];
+  not_multiple20 -> end_node [label="cevap = Hayır"];
+
+  check_balance -> insufficient_balance [label="Evet"];
+  check_balance -> check_daily [label="Hayır"];
+
+  insufficient_balance -> ask_amount [label="cevap = Evet"];
+  insufficient_balance -> end_node [label="cevap = Hayır"];
+
+  check_daily -> daily_limit_exceeded [label="Hayır"]; // aşıyor
+  check_daily -> confirm [label="Evet"];
+
+  daily_limit_exceeded -> ask_amount [label="cevap = Evet"];
+  daily_limit_exceeded -> end_node [label="cevap = Hayır"];
+
+  // Onay ve işlem
+  confirm -> perform_tx [label="onay = Evet"];
+  confirm -> cancel_tx [label="onay = Hayır"];
+
+  cancel_tx -> ask_repeat;
+
+  perform_tx -> receipt_prompt;
+
+  receipt_prompt -> print_receipt [label="Evet"];
+  receipt_prompt -> no_receipt [label="Hayır"];
+
+  print_receipt -> ask_repeat;
+  no_receipt -> ask_repeat;
+
+  // İşlem tekrar
+  ask_repeat -> main_menu [label="Evet"];
+  ask_repeat -> end_node [label="Hayır"];
+
+  // Stil (kararları görsel olarak ayır)
+  node [shape=diamond];
+  check_pin; check_balance; check_daily; check_multiple20; check_positive; pin_failed;
+}
+
+
+İstersen:
+
+Bu DOT kodunu daha sadeleştireyim veya alt süreçleri (PIN doğrulama, tutar validasyonu vb.) subgraph ile ayrı kutulara ayırayım.
+
+Düğümlere açıklama / zaman damgası / değişken örnekleri ekleyeyim.
+Hangi biçimde devam edeyim?
+
+Şunu dedin:
+İptal
+Gönder
+ChatGPT:
+9s boyunca düşündüm
+
+Haklısın — orijinal DOT kodunda son kısımdaki node [shape=diamond]; check_pin; ... gibi tekrar tanımlama hataya yol açabilir. Aşağıda her düğümün şekli açıkça verilmiş, noktalı-virgül ve kenar (edge) tanımları düzgün şekilde tamamlanmış düzeltilmiş ve çalıştırılabilir Graphviz DOT kodunu veriyorum. Bu kodu doğrudan .dot dosyasına yapıştırıp dot -Tpng dosya.dot -o flow.png ile görselleştirebilirsin.
+
+digraph ATM {
+  rankdir=TB;
+  graph [fontname="Helvetica"];
+  node [fontname="Helvetica"];
+  edge [fontname="Helvetica"];
+
+  // Düğümler (her düğüm için shape açıkça verildi)
+  start [label="BAŞLA", shape=oval];
+  read_card [label="YAZ: Kartı takınız...\nOKU kart", shape=parallelogram];
+  init_vars [label="Hesap verileri başlat\n(PIN, bakiye, günlük limit,\ngunluk_cekilen=0, max_hak=3)", shape=rectangle];
+
+  pin_prompt [label="YAZ: PIN giriniz\nOKU girilen_PIN", shape=parallelogram];
+  check_pin [label="EGER girilen_PIN = kayıtlı_PIN ?", shape=diamond];
+  pin_ok [label="YAZ: PIN doğrulandı.", shape=rectangle];
+  pin_failed [label="kalan_hak--\nEGER kalan_hak>0 ?", shape=diamond];
+  card_block [label="YAZ: Kartınız bloke edildi.\nSON", shape=oval];
+
+  main_menu [label="YAZ: İşlem seçiniz\n1) Para Çekme  2) Çıkış\nOKU secim", shape=parallelogram];
+  exit_node [label="YAZ: Çıkış yapılıyor.\nHoşça kalın.\nSON", shape=oval];
+
+  ask_amount [label="YAZ: Çekmek istediğiniz tutarı giriniz\nOKU tutar", shape=parallelogram];
+
+  check_positive [label="EGER tutar <= 0 ?", shape=diamond];
+  invalid_amount [label="YAZ: Geçersiz tutar\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
+
+  check_multiple20 [label="EGER tutar MOD 20 = 0 ?", shape=diamond];
+  not_multiple20 [label="YAZ: Tutar 20 TL'nin katı olmalı\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
+
+  check_balance [label="EGER tutar > hesap_bakiye ?", shape=diamond];
+  insufficient_balance [label="YAZ: Yetersiz bakiye\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
+
+  check_daily [label="EGER (gunluk_cekilen + tutar) <= gunluk_limit ?", shape=diamond];
+  daily_limit_exceeded [label="YAZ: Günlük limit aşıyor\nKalan: kalan_limit\nYeni işlem ister misiniz? (E/H)\nOKU cevap", shape=parallelogram];
+
+  confirm [label="YAZ: Onaylıyor musunuz? (E/H)\nOKU onay", shape=parallelogram];
+  cancel_tx [label="YAZ: İşlem onaylanmadı.\nİşlem iptal edildi.", shape=rectangle];
+
+  perform_tx [label="hesap_bakiye -= tutar\ngunluk_cekilen += tutar\nYAZ: Lütfen paranızı alınız...\nYAZ: tutar TL verildi.", shape=rectangle];
+
+  receipt_prompt [label="YAZ: Makbuz almak ister misiniz? (E/H)\nOKU makbuz", shape=parallelogram];
+  print_receipt [label="YAZ: Makbuz yazdırılıyor\n(Makbuz: çekilen tutar, kalan bakiye, bugün çekilen toplam)", shape=rectangle];
+  no_receipt [label="YAZ: Makbuz tercih edilmedi.", shape=rectangle];
+
+  ask_repeat [label="YAZ: Başka işlem yapmak ister misiniz? (E/H)\nOKU tekrar_cevap", shape=parallelogram];
+  end_node [label="Kartınızı alınız.\nHoşça kalın.\nSON", shape=oval];
+
+  // Kenarlar / akış
+  start -> read_card;
+  read_card -> init_vars;
+  init_vars -> pin_prompt;
+  pin_prompt -> check_pin;
+
+  check_pin -> pin_ok [label="Evet"];
+  check_pin -> pin_failed [label="Hayır"];
+
+  pin_ok -> main_menu;
+
+  pin_failed -> card_block [label="kalan_hak = 0"];
+  pin_failed -> pin_prompt [label="kalan_hak > 0"];
+
+  main_menu -> exit_node [label="secim = 2"];
+  main_menu -> ask_amount [label="secim = 1"];
+
+  ask_amount -> check_positive;
+
+  check_positive -> invalid_amount [label="Evet"]; // geçersiz tutar
+  check_positive -> check_multiple20 [label="Hayır"];
+
+  invalid_amount -> ask_amount [label="cevap = Evet"];
+  invalid_amount -> end_node [label="cevap = Hayır"];
+
+  check_multiple20 -> not_multiple20 [label="Hayır"]; // MOD20 != 0
+  check_multiple20 -> check_balance [label="Evet"];
+
+  not_multiple20 -> ask_amount [label="cevap = Evet"];
+  not_multiple20 -> end_node [label="cevap = Hayır"];
+
+  check_balance -> insufficient_balance [label="Evet"];
+  check_balance -> check_daily [label="Hayır"];
+
+  insufficient_balance -> ask_amount [label="cevap = Evet"];
+  insufficient_balance -> end_node [label="cevap = Hayır"];
+
+  check_daily -> daily_limit_exceeded [label="Hayır"]; // aşıyor
+  check_daily -> confirm [label="Evet"];
+
+  daily_limit_exceeded -> ask_amount [label="cevap = Evet"];
+  daily_limit_exceeded -> end_node [label="cevap = Hayır"];
+
+  confirm -> perform_tx [label="onay = Evet"];
+  confirm -> cancel_tx [label="onay = Hayır"];
+
+  cancel_tx -> ask_repeat;
+
+  perform_tx -> receipt_prompt;
+
+  receipt_prompt -> print_receipt [label="Evet"];
+  receipt_prompt -> no_receipt [label="Hayır"];
+
+  print_receipt -> ask_repeat;
+  no_receipt -> ask_repeat;
+
+  ask_repeat -> main_menu [label="Evet"];
+  ask_repeat -> end_node [label="Hayır"];
+}
+
+
+Eğer istersen:
+
+Daha kısa bir versiyon isteyebilirsin (alt süreçleri subgraph ile gruplayarak),
+
+Düğümler için renk/konum (rank) ayarları ekleyebilirim,
+
+Ya da .png çıktısını üretip paylaşmamı istersen (ben burada doğrudan dosya üretemiyorum, ama komut veririm).
+
+Hangisini yapayım?
